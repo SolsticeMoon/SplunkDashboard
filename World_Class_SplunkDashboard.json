@@ -1,0 +1,271 @@
+{
+    "visualizations": {
+        "viz_6inYTJVn": {
+            "type": "splunk.events",
+            "title": "Feed",
+            "dataSources": {
+                "primary": "ds_pNYbmTga"
+            },
+            "options": {
+                "backgroundColor": "#1a1b26"
+            },
+            "showProgressBar": false,
+            "showLastUpdated": true,
+            "description": "Key events"
+        },
+        "viz_iUPjTH7G": {
+            "type": "splunk.table",
+            "title": "Alerts",
+            "options": {
+                "backgroundColor": "#1a1b26",
+                "tableFormat": {
+                    "rowBackgroundColors": "> table | seriesByIndex(0) | pick(tableAltRowBackgroundColorsByBackgroundColor)",
+                    "headerBackgroundColor": "> backgroundColor | setColorChannel(tableHeaderBackgroundColorConfig)",
+                    "rowColors": "> rowBackgroundColors | maxContrast(tableRowColorMaxContrast)",
+                    "headerColor": "> headerBackgroundColor | maxContrast(tableRowColorMaxContrast)"
+                },
+                "columnFormat": {
+                    "EventCode": {
+                        "width": 43,
+                        "data": "> table | seriesByName(\"EventCode\") | formatByType(EventCodeColumnFormatEditorConfig)",
+                        "rowColors": "> table | seriesByName('EventCode') | pick(EventCodeRowColorsEditorConfig)",
+                        "rowBackgroundColors": "> table | seriesByName(\"EventCode\") | rangeValue(EventCodeRowBackgroundColorsEditorConfig)"
+                    },
+                    "#": {
+                        "width": 30
+                    },
+                    "Time": {
+                        "width": 30
+                    },
+                    "Short_Time": {
+                        "width": 49
+                    },
+                    "Account_Name": {
+                        "width": 81
+                    },
+                    "Group_Name": {
+                        "data": "> table | seriesByName(\"Group_Name\") | formatByType(Group_NameColumnFormatEditorConfig)",
+                        "rowColors": "> table | seriesByName(\"Group_Name\") | matchValue(Group_NameRowColorsEditorConfig)",
+                        "width": 64
+                    }
+                }
+            },
+            "dataSources": {
+                "primary": "ds_9vGotgda"
+            },
+            "context": {
+                "EventCodeColumnFormatEditorConfig": {
+                    "number": {
+                        "thousandSeparated": false,
+                        "unitPosition": "after"
+                    }
+                },
+                "EventCodeRowColorsEditorConfig": [
+                    "#ffffff"
+                ],
+                "EventCodeRowBackgroundColorsEditorConfig": [
+                    {
+                        "value": "#9ece6a",
+                        "to": 4732
+                    },
+                    {
+                        "value": "#f7768e",
+                        "from": 4732
+                    }
+                ],
+                "Group_NameColumnFormatEditorConfig": {
+                    "string": {
+                        "unitPosition": "after"
+                    }
+                },
+                "Group_NameRowColorsEditorConfig": [
+                    {
+                        "match": "Administrators",
+                        "value": "#f7768e"
+                    }
+                ]
+            },
+            "eventHandlers": [
+                {
+                    "type": "drilldown.linkToSearch",
+                    "options": {
+                        "type": "auto",
+                        "newTab": true
+                    }
+                }
+            ],
+            "showLastUpdated": true
+        },
+        "viz_sBUutU6G": {
+            "type": "splunk.column",
+            "dataSources": {
+                "primary": "ds_2NZjMlpc"
+            },
+            "showProgressBar": false,
+            "showLastUpdated": false,
+            "title": "Event Count",
+            "options": {
+                "seriesColorsByField": {
+                    "Critical": "#ff9e64",
+                    "Other": "#2ac3de"
+                },
+                "seriesSpacing": 0,
+                "columnSpacing": 0,
+                "xAxisTitleText": "TIME",
+                "yAxisTitleText": "EVENT COUNT",
+                "yAxisTitleVisibility": "hide",
+                "annotationColor": "> annotation | seriesByName('AnnotatedEventCount')",
+                "backgroundColor": "#1a1b26",
+                "annotationX": "> annotation | seriesByName('AnnotatedEventCount')",
+                "legendDisplay": "bottom"
+            }
+        }
+    },
+    "dataSources": {
+        "ds_pNYbmTga": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* (EventCode=4624 OR EventCode=4625 OR EventCode=4672 OR EventCode=4673 OR EventCode=4720 OR EventCode=4732 OR EventCode=5140 OR EventCode=5142 OR EventCode=5152)\n"
+            },
+            "name": "FEED_WindowsEvents"
+        },
+        "ds_4EOjxSaf": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* sourcetype=\"smb_traffic_logs\" version=\"1.0\""
+            },
+            "name": "SMBv1_search"
+        },
+        "ds_Si7VURxg": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* (dest_port=139 OR dest_port=445) "
+            },
+            "name": "Important Ports"
+        },
+        "ds_r6zFOErU": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* sourcetype=\"smb_traffic_logs\" smb_command=\"SMB_COM_TRANSACTION2\""
+            },
+            "name": "Transaction_2"
+        },
+        "ds_AydzACnz": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=your_index_name sourcetype=\"smb_traffic_logs\" smb_command=\"SMB_COM_TRANSACTION2\""
+            },
+            "name": "Port connections"
+        },
+        "ds_Xh6IHkMO": {
+            "type": "ds.search",
+            "options": {
+                "query": "sourcetype=snort | timechart count as events,dc(src_ip) as sources"
+            },
+            "name": "Snort_Events"
+        },
+        "ds_ji7fbCLP": {
+            "type": "ds.search",
+            "options": {
+                "query": "*"
+            },
+            "name": "Search_1"
+        },
+        "ds_9vGotgda": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* sourcetype=\"WinEventLog:Security\" EventCode=4720 OR (EventCode=4732) | eval Time=strftime(_time, \"%d-%m %H:%M:%S\")| table Time EventCode Group_Name Account_Name host"
+            },
+            "name": "ALERTS_WinEvents"
+        },
+        "ds_vel93tyz": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* (EventCode=4624 OR EventCode=4625 OR EventCode=4672 OR EventCode=4673 OR EventCode=4720 OR EventCode=4732 OR EventCode=5140 OR EventCode=5142 OR EventCode=5152)\r\n| timechart span=5m count as EventCount",
+                "enableSmartSources": true
+            },
+            "name": "LINE WORLD"
+        },
+        "ds_2NZjMlpc": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* (EventCode=4624 OR EventCode=4625 OR EventCode=4672 OR EventCode=4673 OR EventCode=4720 OR EventCode=4732 OR EventCode=5140 OR EventCode=5142 OR EventCode=5152)\r\n| eval EventCodeType=if(EventCode=\"4732\", \"Critical\", \"Other\")\r\n| timechart span=1m count as EventCount by EventCodeType\r\n"
+            },
+            "name": "COLUMN_EventCount"
+        },
+        "ds_Xm99BwbR": {
+            "type": "ds.search",
+            "options": {
+                "query": "index=* (EventCode=4624 OR EventCode=4625 OR EventCode=4672 OR EventCode=4673 OR EventCode=4720 OR EventCode=4732 OR EventCode=5140 OR EventCode=5142 OR EventCode=5152)\r\n| table strftime(_time, \"%A, %B %d, %Y\") as Time, EventCode, _raw as Message, host, source, sourcetype\r\n"
+            },
+            "name": "EVENT TABLE"
+        }
+    },
+    "defaults": {
+        "dataSources": {
+            "ds.search": {
+                "options": {
+                    "queryParameters": {
+                        "latest": "$global_time.latest$",
+                        "earliest": "$global_time.earliest$"
+                    }
+                }
+            }
+        }
+    },
+    "inputs": {
+        "input_global_trp": {
+            "type": "input.timerange",
+            "options": {
+                "token": "global_time",
+                "defaultValue": "0,"
+            },
+            "title": "Global Time Range"
+        }
+    },
+    "layout": {
+        "type": "grid",
+        "options": {
+            "width": 1440,
+            "height": 960,
+            "submitButton": true
+        },
+        "structure": [
+            {
+                "item": "viz_iUPjTH7G",
+                "type": "block",
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 799,
+                    "h": 567
+                }
+            },
+            {
+                "item": "viz_6inYTJVn",
+                "type": "block",
+                "position": {
+                    "x": 0,
+                    "y": 567,
+                    "w": 1440,
+                    "h": 895
+                }
+            },
+            {
+                "item": "viz_sBUutU6G",
+                "type": "block",
+                "position": {
+                    "x": 799,
+                    "y": 0,
+                    "w": 641,
+                    "h": 567
+                }
+            }
+        ],
+        "globalInputs": [
+            "input_global_trp"
+        ]
+    },
+    "description": "Victory needs no excuse; defeat allows none",
+    "title": "World Class"
+}
